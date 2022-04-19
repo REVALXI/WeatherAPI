@@ -1,7 +1,14 @@
 package com.example.weathertestfinal.response;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.List;
 
+@Getter
+@Setter
+@AllArgsConstructor
 public class Hourly {
     private long dt;
     private double temp;

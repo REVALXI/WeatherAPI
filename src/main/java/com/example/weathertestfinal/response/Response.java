@@ -16,11 +16,5 @@ public class Response {
     private double lon;
     private String timezone;
     private long timezone_offset;
-    private Current current;
-    //private List<Minutely> minutely;
-    //private List<Hourly> hourly;
-    //private List<Daily> daily;
-    //private List<Alerts> alerts;
-    private List<Alerts> alerts;
 }
 

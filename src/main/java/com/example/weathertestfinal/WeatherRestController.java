@@ -1,77 +1,129 @@
 package com.example.weathertestfinal;
 
-import com.example.weathertestfinal.response.Response;
+import com.example.weathertestfinal.response.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URI;
 
 @RestController
 public class WeatherRestController {
 
     @Autowired
-    private WeatherService consumer;
+    private WeatherService service;
 
+    @Value("classpath:location.json")
+    Resource resourceFile;
 
-    @GetMapping("/current")
-    public Response getCurrentWeather() {
-        return consumer.getCurrentWeather();
+    @Autowired
+    ObjectMapper objectMapper;
+
+    @GetMapping("/")
+    public String home(){
+        return("Available locations:<br>" +
+                "Sydney, Canberra, Darwin, Brisbane, Adelaide, Hobard, Melbourne, Perth<br><br>" +
+                "GET commands:<br>" +
+                "/(location)/current<br>" +
+                "/(location)/minutely<br>" +
+                "/(location)/minutely/(id)<br>" +
+                "/(location)/hourly<br>" +
+                "/(location)/hourly/(id)<br>" +
+                "/(location)/daily<br>" +
+                "/(location)/daily/(id)<br>" +
+                "/(location)/alerts<br>");
+
     }
 
-//    @Value("classpath:location.json")
-//    Resource resourceFile;
-//
-//    @Autowired
-//    ObjectMapper objectMapper;
-
-    @RequestMapping("/test/{location}")
-    public Response getDailyWeather2(@PathVariable String location) throws IOException {
-//        JsonNode jsonNode = objectMapper.readTree(resourceFile.getFile());
-//        try{
-//            String lat = jsonNode.get(location).get("lat").toString();
-//            System.out.println(lat);
-//            return getDailyWeather(lat);
-//        }
-//        catch(Exception e){
-//            System.out.println("111");
-//        }
-//        System.out.println("222");
-//        return null;
-        return consumer.getDailyWeather2();
+    @GetMapping("/{location}/current")
+    public CurrentWeather getCurrentWeather(@PathVariable String location){
+        return service.getCurrentWeather(getResponse(location));
     }
 
+    @GetMapping("/{location}/minutely")
+    public MinutelyWeather getMinutelyWeather(@PathVariable String location){
+        return service.getMinutelyWeather(getResponse(location));
+    }
 
-//    @GetMapping("/test/{location}")
-//    public String getDailyWeather(@PathVariable String location) throws IOException {
-//        float lat;
-//        float lon;
-//        String l;
-//
-//        File resource = new ClassPathResource(
-//                "location.json").getFile();
-//        l = new String(
-//                Files.readAllBytes(resource.toPath()));
-//
-//        //resourceFile.getFile("qwe");
-//
-//        return l;
-//    }
+    //num = how many minutes in the future to forecast range (0-60)
+    @GetMapping("/{location}/minutely/{num}")
+    public Minutely getMinutelyWeather(@PathVariable String location, @PathVariable int num){
+        try{
+            return service.getMinutelyWeather(
+                    getResponse(location)).getMinutely().get(num-1);
+        }
+        catch(IndexOutOfBoundsException exc){
+        throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "1111111111", exc);
+        }
+    }
 
+    @GetMapping("/{location}/hourly")
+    public HourlyWeather getHourlyWeather(@PathVariable String location){
+        return service.getHourlyWeather(getResponse(location));
+    }
 
-//    @GetMapping("/alerts")
-//    public String getBooksInfo() {
-//        return "Accessing from STUDENT-SERVICE ==> " + consumer.getAlerts();
-//    }
-//
-//    @GetMapping("/lat={lat}")
-//    @ResponseBody
-//    public String getWeather(@PathVariable String lat){
-//        String request = "lat="+lat+"&lon=-94.04&appid=f7fc17b9446d57bddf6d116dd8b29aa7";
-//        return consumer.getWeather(request);
-//        //return request;
-//    }
+    //num = how many hours in the future to forecast range (1-48)
+    @GetMapping("/{location}/hourly/{num}")
+    public Hourly getHourlyWeather(@PathVariable String location, @PathVariable int num){
+        try{
+            return service.getHourlyWeather(
+                    getResponse(location)).getHourly().get(num-1);
+
+        }
+        catch(IndexOutOfBoundsException exc){
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "1111111111", exc);
+        }
+    }
+
+    @GetMapping("/{location}/daily")
+    public DailyWeather getDailyWeather(@PathVariable String location){
+        return service.getDailyWeather(getResponse(location));
+    }
+
+    //num = how many days in the future to forecast range (0-7)
+    @GetMapping("/{location}/daily/{num}")
+    public Daily getDailyWeather(@PathVariable String location, @PathVariable int num){
+        try{
+            return service.getDailyWeather(getResponse(location)).getDaily().get(num);
+        }
+        catch(IndexOutOfBoundsException exc){
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "1111111111", exc);
+        }
+    }
+
+    @GetMapping("/{location}/alerts")
+    public WeatherAlerts getWeatherAlerts(@PathVariable String location){
+        return service.getWeatherAlerts(getResponse(location));
+    }
+
+    public double[] getResponse(String location){
+        try{
+            JsonNode jsonNode = objectMapper.readTree(resourceFile.getFile());
+            double lat = jsonNode.get(location).get("lat").asDouble();
+            double lon = jsonNode.get(location).get("lon").asDouble();
+            System.out.println("111");
+            return new double[]{lat, lon};
+        }
+        catch(FileNotFoundException exc){
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "999999999", exc);
+        }
+        catch(FeignException.NotFound exc){
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "1111111111", exc);
+        }
+        catch(Exception exc){
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "A000000000000", exc);
+        }
+    }
 }
