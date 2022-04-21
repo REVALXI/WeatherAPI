@@ -6,18 +6,26 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+
+import java.io.*;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 @RestController
+@Component
 public class WeatherRestController {
 
     @Autowired
-    private WeatherService service;
+    WeatherService service;
 
     @Value("classpath:location.json")
     Resource resourceFile;
@@ -25,21 +33,23 @@ public class WeatherRestController {
     @Autowired
     ObjectMapper objectMapper;
 
-    @GetMapping("/")
-    public String home(){
-        return("Available locations:<br>" +
-                "Sydney, Canberra, Darwin, Brisbane, Adelaide, Hobard, Melbourne, Perth<br><br>" +
-                "GET commands:<br>" +
-                "/(location)/current<br>" +
-                "/(location)/minutely<br>" +
-                "/(location)/minutely/(id)<br>" +
-                "/(location)/hourly<br>" +
-                "/(location)/hourly/(id)<br>" +
-                "/(location)/daily<br>" +
-                "/(location)/daily/(id)<br>" +
-                "/(location)/alerts<br>");
-
+    public WeatherRestController(WeatherService weatherService){
+        this.service = weatherService;
     }
+
+//    @GetMapping("/")
+//    public String home(){
+//        return("Available locations:<br>" +
+//                "Sydney, Canberra, Darwin, Brisbane, Adelaide, Hobard, Melbourne, Perth<br><br>" +
+//                "GET commands:<br>" +
+//                "/(location)/current<br>" +
+//                "/(location)/minutely<br>" +
+//                "/(location)/minutely/(id)<br>" +
+//                "/(location)/hourly<br>" +
+//                "/(location)/hourly/(id)<br>" +
+//                "/(location)/daily<br>" +
+//                "/(location)/daily/(id)<br>" +
+//                "/(location)/alerts<br>");
 
     @GetMapping("/{location}/current")
     public CurrentWeather getCurrentWeather(@PathVariable String location){
@@ -60,7 +70,7 @@ public class WeatherRestController {
         }
         catch(IndexOutOfBoundsException exc){
         throw new ResponseStatusException(
-                HttpStatus.NOT_FOUND, "1111111111", exc);
+                HttpStatus.NOT_FOUND, "Index Out Of Bounds", exc);
         }
     }
 
@@ -79,7 +89,7 @@ public class WeatherRestController {
         }
         catch(IndexOutOfBoundsException exc){
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "1111111111", exc);
+                    HttpStatus.NOT_FOUND, "Index Out Of Bounds", exc);
         }
     }
 
@@ -96,7 +106,7 @@ public class WeatherRestController {
         }
         catch(IndexOutOfBoundsException exc){
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "1111111111", exc);
+                    HttpStatus.NOT_FOUND, "Index Out Of Bounds", exc);
         }
     }
 
@@ -115,15 +125,15 @@ public class WeatherRestController {
         }
         catch(FileNotFoundException exc){
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "999999999", exc);
+                    HttpStatus.NOT_FOUND, "File Not Found Exception", exc);
         }
         catch(FeignException.NotFound exc){
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "1111111111", exc);
+                    HttpStatus.NOT_FOUND, "Feign Exception Not Found", exc);
         }
         catch(Exception exc){
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "A000000000000", exc);
+                    HttpStatus.NOT_FOUND, "Unknown Exception", exc);
         }
     }
 }

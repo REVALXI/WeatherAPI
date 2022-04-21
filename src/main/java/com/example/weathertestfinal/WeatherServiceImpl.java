@@ -2,11 +2,16 @@ package com.example.weathertestfinal;
 
 import com.example.weathertestfinal.response.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
 
 @Service
+@Configuration
+@ComponentScan(basePackageClasses = WeatherRestController.class)
 public class WeatherServiceImpl implements WeatherService{
     @Autowired
     private WeatherRestConsumer consumer;

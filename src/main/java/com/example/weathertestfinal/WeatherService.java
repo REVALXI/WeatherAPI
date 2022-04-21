@@ -1,6 +1,7 @@
 package com.example.weathertestfinal;
 
 import com.example.weathertestfinal.response.*;
+import org.springframework.context.annotation.Bean;
 
 public interface WeatherService {
     CurrentWeather getCurrentWeather(double[] coordinates);
