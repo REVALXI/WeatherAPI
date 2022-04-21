@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 import java.net.URI;
 
 @Service
-@Configuration
-@ComponentScan(basePackageClasses = WeatherRestController.class)
+//@Configuration
+//@ComponentScan(basePackageClasses = WeatherRestController.class)
 public class WeatherServiceImpl implements WeatherService{
     @Autowired
     private WeatherRestConsumer consumer;
