@@ -1,13 +1,10 @@
-package com.example.weathertestfinal.response;
+package com.example.weatherapi.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
 @Getter
-@Setter
 @AllArgsConstructor
 public class Daily {
     private long dt;
@@ -28,5 +25,4 @@ public class Daily {
     private double pop;
     private double rain;
     private double uvi;
-
 }

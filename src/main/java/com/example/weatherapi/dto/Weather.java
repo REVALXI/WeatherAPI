@@ -1,10 +1,7 @@
-package com.example.weathertestfinal.response;
+package com.example.weatherapi.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Setter
 @Getter
 @AllArgsConstructor
 public class Weather {

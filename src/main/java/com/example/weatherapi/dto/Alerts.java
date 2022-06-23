@@ -1,14 +1,11 @@
-package com.example.weathertestfinal.response;
+package com.example.weatherapi.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
-@AllArgsConstructor
 @Getter
-@Setter
+@AllArgsConstructor
 public class Alerts {
     private String sender_name;
     private String event;

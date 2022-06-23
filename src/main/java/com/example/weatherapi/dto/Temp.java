@@ -1,11 +1,8 @@
-package com.example.weathertestfinal.response;
+package com.example.weatherapi.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
-@Setter
 @AllArgsConstructor
 public class Temp {
     private double day;
